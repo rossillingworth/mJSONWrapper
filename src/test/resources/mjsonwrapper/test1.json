@@ -1,8 +1,18 @@
 {
     "a":1,
     "b":2,
-    "c":{
-        "d":3
+    "c":3,
+    "d":4,
+    "e":{
+        "f":6,
+        "g":true
     },
-    "e":{}
+    "types":{
+        "string":"a string",
+        "number":123,
+        "object":{"a":"b"},
+        "array":[1,2,3],
+        "boolean":true,
+        "null":null
+    }
 }
