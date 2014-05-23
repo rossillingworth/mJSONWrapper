@@ -4,6 +4,7 @@ import mjson.Json;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Note:
@@ -11,6 +12,8 @@ import java.util.Map;
  * use toString instead
  */
 public class MJsonWrapper {
+
+    public enum TYPE {STRING,NUMBER,OBJECT,ARRAY,BOOLEAN,NULL};
 
     private Json json;
 
@@ -92,6 +95,12 @@ public class MJsonWrapper {
         j.set(lastName, value);
     }
 
+    public MjsonType typeOf(String path){
+        Json json = this.get(path);
+        return MjsonType.typeOf(json);
+    }
+
+
     /**
      * Compare current data against a stringified JSON object
      *
@@ -111,17 +120,15 @@ public class MJsonWrapper {
         return compare(this.json,json);
     }
 
-
     /**
-     * Compare 2 JSON objects in String form
-     *
-     * @param json1
-     * @param json2
+     * Compare current data against another MJsonWrapper object
+     * @param json
      * @return
      */
-    public static boolean compare(String json1, String json2){
-        return compare(Json.read(json1),Json.read(json2));
+    public boolean compare(MJsonWrapper json){
+        return compare(this.json,json.get());
     }
+
 
     /**
      * Compare 2 Json objects
@@ -131,34 +138,114 @@ public class MJsonWrapper {
      * @param json2
      * @return
      */
-    public static boolean compare(Json json1, Json json2){
+    public boolean compare(Json json1, Json json2){
 
         Map<String,Object> map1 = json1.asMap();
         Map<String,Object> map2 = json2.asMap();
 
         // check size
         boolean ok = map1.size() == map2.size();
+        check(ok,"JSON Objects different sizes [%s] [%s]",map1.size(),map2.size());
 
-        Iterator<String> it = map1.keySet().iterator();
-        while(ok && it.hasNext()){
-            String key = it.next();
-            if(json1.at(key).isObject()){
-                if(json2.has(key) && json2.at(key).isObject()){
-                    ok = compare(json1.at(key),json2.at(key));
-                }else{
-                    ok = false;
-                }
-            }else{
-                String v1 = json1.at(key).asString();
-                String v2 = json2.at(key).asString();
-                ok = v1.equals(v2);
-            }
+        // verify names are identical
+        if(ok){
+            Set keySet1 = map1.keySet();
+            Set keySet2 = map2.keySet();
+            keySet2.removeAll(keySet1);
+            ok = ok && keySet2.isEmpty();
+            check(ok,"JSON Keys are different [%s]",keySet2.toString());
         }
 
+        //
+        // Loop through keyset,
+        // - make sure key exists is 2nd object
+        // - if either object is an Object/array/primitive -> make sure both are
+        //
+        String key = null;
+        try{
+            Iterator<String> it = map1.keySet().iterator();
+            while(ok && it.hasNext()){
+                key = it.next();
+                if(!json2.has(key)){
+                    check(ok,"json2 missing %s",key);
+                    ok = false;
+                }else{
+
+                    MjsonType type1 = MjsonType.typeOf(json1.at(key));
+                    MjsonType type2 = MjsonType.typeOf(json2.at(key));
+
+                    if(!type1.equals(type2)){
+                        ok = false;
+                        check(ok,"Name[%s] type mismatch",key);
+                    }else{
+                        switch (type1){
+                            case OBJECT:
+                            case ARRAY:
+                                ok = compare(json1.at(key),json2.at(key));
+                                break;
+                            case NULL:
+                                // do nothing as both nulls
+                                break;
+                            case BOOLEAN:
+                                boolean b1 = json1.at(key).asBoolean();
+                                boolean b2 = json2.at(key).asBoolean();
+                                ok = b1 == b2;
+                                break;
+                            case NUMBER:
+                            case STRING:
+                                try{
+                                String v1 = json1.at(key).asString();
+                                String v2 = json2.at(key).asString();
+                                ok = v1.equals(v2);
+                                }catch(UnsupportedOperationException uoe){
+                                    uoe.printStackTrace();
+                                }
+                                break;
+                            default:
+                                throw new IllegalArgumentException("Unknown JSON Type");
+                        }
+                        check(ok,"Name[%s] mismatch",key);
+                    }
+                }
+            }
+        }catch(UnsupportedOperationException uoe){
+
+            System.out.println(String.format("Error js1: %s",json1.toString()));
+            System.out.println(String.format("Error js2: %s",json2.toString()));
+            System.out.println(String.format("looking for: %s",key));
+            uoe.printStackTrace();
+        }
 
         return ok;
     }
 
+
+    /**
+     * TODO: rewrite this
+     * TODO: add to an array as you pass into a object, remove as you pass back
+     *
+     * @param ok
+     * @param msg
+     * @param args
+     */
+    private void check(boolean ok, String msg, Object... args){
+        if(!ok){
+            String formatedMsg = String.format(msg,args);
+            System.out.println(formatedMsg);
+        }
+    }
+
+    /**
+     * Compare 2 JSON objects in String form
+     *
+     * @param json1
+     * @param json2
+     * @return
+     */
+    public static boolean compare(String json1, String json2){
+        MJsonWrapper mJsonWrapper = new MJsonWrapper(json1);
+        return mJsonWrapper.compare(json2);
+    }
 
     /**
      * Return entire JSON object in Stringified form
@@ -168,4 +255,5 @@ public class MJsonWrapper {
     public String toString() {
         return json.toString();
     }
+
 }

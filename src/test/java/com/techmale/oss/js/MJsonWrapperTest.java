@@ -24,7 +24,7 @@ public class MJsonWrapperTest {
     }
 
     @Test
-    public void createEmptyAndSetValuesTest() {
+    public void createEmptyObjectAndSetValuesTest() {
 
         MJsonWrapper mJsonWrapper = new MJsonWrapper();
 
@@ -37,46 +37,40 @@ public class MJsonWrapperTest {
     }
 
     @Test
-    public void parseFileExtractDataAndConfirmTest() throws IOException {
+    /**
+     * Simply confirm the test file exists
+     * Unneeded really, as it would throw an exception, but nice to have
+     */
+    public void parseConfirmTestFileExistsTest() throws IOException {
 
         String jsonString = readFileAsString("/mjsonwrapper/test1.json");
         assertNotNull(jsonString);
 
-        MJsonWrapper mJsonWrapper = new MJsonWrapper(jsonString);
-
-        assertEquals(3, mJsonWrapper.get("c.d").asInteger());
-        assertEquals("3", mJsonWrapper.get("c.d").asString());
-
     }
 
-    @Test
-    public void compareTest() throws IOException {
+        @Test
+    public void parseFile_ExtractData_ConfirmTest() throws IOException {
 
-        String jsonString1 = readFileAsString("/mjsonwrapper/test1.json");
-        String jsonString2 = readFileAsString("/mjsonwrapper/test2.json");
-        String jsonString3 = readFileAsString("/mjsonwrapper/test3.json");
+        String jsonString = readFileAsString("/mjsonwrapper/test1.json");
+        MJsonWrapper mJsonWrapper = new MJsonWrapper(jsonString);
+        assertEquals(3, mJsonWrapper.get("c").asInteger());
+        assertEquals("3", mJsonWrapper.get("c").asString());
+        assertEquals(6, mJsonWrapper.get("e.f").asInteger());
+        assertEquals(true, mJsonWrapper.get("e.g").asBoolean());
 
-        assertTrue(MJsonWrapper.compare(jsonString1, jsonString1));
-        assertFalse(MJsonWrapper.compare(jsonString1, jsonString2));
-        assertFalse(MJsonWrapper.compare(jsonString1, jsonString3));
     }
 
     @Test
     @Ignore
-    public void createProperties() throws IOException {
+    public void createPropertiesTest() throws IOException {
 
         String jsonString = readFileAsString("/mjsonwrapper/test1.json");
-        assertNotNull(jsonString);
-
         MJsonWrapper mJsonWrapper = new MJsonWrapper(jsonString);
-
         mJsonWrapper.set("x.y.z.boolean", true);
         mJsonWrapper.set("x.y.z.integer", 1);
         mJsonWrapper.set("x.y.z.string", "hello world");
         mJsonWrapper.set("x.y.z.char", "c");
-        mJsonWrapper.set("x.y.z.map", new HashMap() {{
-            put("key1", "val1");
-        }});
+        mJsonWrapper.set("x.y.z.map", new HashMap() {{put("key1", "val1");}});
 
         String expect = "{\"e\":{},\"b\":2,\"c\":{\"d\":3},\"a\":1,\"x\":{\"y\":{\"z\":{\"char\":\"c\",\"integer\":1,\"string\":\"hello world\",\"map\":{\"key1\":\"val1\"},\"boolean\":true}}}}";
 
@@ -87,9 +81,7 @@ public class MJsonWrapperTest {
         assertEquals(1, mJsonWrapper.get("x.y.z.integer").asInteger());
         assertEquals("hello world", mJsonWrapper.get("x.y.z.string").asString());
         assertEquals('c', mJsonWrapper.get("x.y.z.char").asChar());
-        assertEquals(new HashMap() {{
-            put("key1", "val1");
-        }}, mJsonWrapper.get("x.y.z.map").asMap());
+        assertEquals(new HashMap() {{put("key1", "val1");}}, mJsonWrapper.get("x.y.z.map").asMap());
 
     }
 
@@ -99,10 +91,8 @@ public class MJsonWrapperTest {
     public void missingPropertyThrowsExceptionTest() throws IOException {
 
         String jsonString = readFileAsString("/mjsonwrapper/test1.json");
-        assertNotNull(jsonString);
-
         MJsonWrapper mJsonWrapper = new MJsonWrapper(jsonString);
-        mJsonWrapper.get("e.f");
+        mJsonWrapper.get("e.z");
 
     }
 
@@ -110,12 +100,53 @@ public class MJsonWrapperTest {
     public void expectedObjectIsValueThrowsExceptionTest() throws IOException {
 
         String jsonString = readFileAsString("/mjsonwrapper/test1.json");
-        assertNotNull(jsonString);
-
         MJsonWrapper mJsonWrapper = new MJsonWrapper(jsonString);
         mJsonWrapper.get("b.c");
 
     }
+
+    @Test
+    public void typeTest() throws IOException {
+        // load JSON string
+        String jsonString = readFileAsString("/mjsonwrapper/test1.json");
+        MJsonWrapper mJsonWrapper = new MJsonWrapper(jsonString);
+        assertEquals(MjsonType.STRING ,mJsonWrapper.typeOf("types.string"));
+        assertEquals(MjsonType.NUMBER ,mJsonWrapper.typeOf("types.number"));
+        assertEquals(MjsonType.OBJECT ,mJsonWrapper.typeOf("types.object"));
+        assertEquals(MjsonType.ARRAY  ,mJsonWrapper.typeOf("types.array"));
+        assertEquals(MjsonType.BOOLEAN,mJsonWrapper.typeOf("types.boolean"));
+        assertEquals(MjsonType.NULL   ,mJsonWrapper.typeOf("types.null"));
+
+    }
+
+    @Test
+    public void compareTest1() throws IOException {
+        // load JSON string
+        String jsonString = readFileAsString("/mjsonwrapper/test1.json");
+        // populate 2 identical objects
+        MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString);
+        MJsonWrapper mJsonWrapper2 = new MJsonWrapper(jsonString);
+        // test both variants
+        assertTrue(mJsonWrapper1.compare(mJsonWrapper2));
+        assertFalse(mJsonWrapper2.compare(mJsonWrapper1));
+
+    }
+
+    @Test
+    public void compareTest2() throws IOException {
+        // load JSON string
+        String jsonString1 = readFileAsString("/mjsonwrapper/test1.json");
+        // populate 2 identical objects
+        MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString1);
+        MJsonWrapper mJsonWrapper2 = new MJsonWrapper(jsonString1);
+        // modify one of the objects
+        mJsonWrapper2.set("x",1);
+        // test both variants
+        assertFalse(mJsonWrapper1.compare(mJsonWrapper2));
+        assertFalse(mJsonWrapper2.compare(mJsonWrapper1));
+
+    }
+
 
     /**
      * Load file from resouces
