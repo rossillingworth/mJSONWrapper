@@ -11,7 +11,7 @@
         "string":"a string",
         "number":123,
         "object":{"a":"b"},
-        "array":[1,2,3],
+        "array":[1,2,3,"substring",{"z":["1","2",null]}],
         "boolean":true,
         "null":null
     }

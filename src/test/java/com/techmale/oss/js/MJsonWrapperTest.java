@@ -119,34 +119,6 @@ public class MJsonWrapperTest {
 
     }
 
-    @Test
-    public void compareTest1() throws IOException {
-        // load JSON string
-        String jsonString = readFileAsString("/mjsonwrapper/test1.json");
-        // populate 2 identical objects
-        MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString);
-        MJsonWrapper mJsonWrapper2 = new MJsonWrapper(jsonString);
-        // test both variants
-        assertTrue(mJsonWrapper1.compare(mJsonWrapper2));
-        assertFalse(mJsonWrapper2.compare(mJsonWrapper1));
-
-    }
-
-    @Test
-    public void compareTest2() throws IOException {
-        // load JSON string
-        String jsonString1 = readFileAsString("/mjsonwrapper/test1.json");
-        // populate 2 identical objects
-        MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString1);
-        MJsonWrapper mJsonWrapper2 = new MJsonWrapper(jsonString1);
-        // modify one of the objects
-        mJsonWrapper2.set("x",1);
-        // test both variants
-        assertFalse(mJsonWrapper1.compare(mJsonWrapper2));
-        assertFalse(mJsonWrapper2.compare(mJsonWrapper1));
-
-    }
-
 
     /**
      * Load file from resouces
