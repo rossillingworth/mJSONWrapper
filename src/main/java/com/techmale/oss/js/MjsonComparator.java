@@ -13,6 +13,17 @@ public class MjsonComparator {
     private LinkedList<String> logList = new LinkedList();
 
     /**
+     * Compare 2 MjsonWrapper Objects
+     *
+     * @param mJsonWrapper1
+     * @param mJsonWrapper2
+     * @return
+     */
+    public boolean compare(MJsonWrapper mJsonWrapper1, MJsonWrapper mJsonWrapper2){
+        return compare(mJsonWrapper1.get(), mJsonWrapper2.get());
+    }
+
+    /**
      * Compare 2 Json objects
      * Uses a tree walk, so may be a bit slow
      *
@@ -43,7 +54,7 @@ public class MjsonComparator {
                                 String key = it.next();
                                 logList.push(key);
                                 ok = compare(json1.at(key),json2.at(key));
-                                check(ok,true,"Object mismatch");
+                                check(ok,true,"");
                             }
                         }else{
                             ok = false;
@@ -63,7 +74,7 @@ public class MjsonComparator {
                             }
                         }else{
                             ok = false;
-                            check(ok,true,"Object property maps mismatch");
+                            check(ok,true,"Array index mismatch");
                         }
                         break;
                     case NULL:
@@ -108,15 +119,15 @@ public class MjsonComparator {
      * @return
      */
     public boolean compareObjectMaps(Map<String,Object> map1, Map<String,Object> map2){
-        boolean ok = false;
-        if(map1.size() == map2.size()){
-            Set keySet1 = map1.keySet();
-            Set keySet2 = map2.keySet();
-            if(keySet1.containsAll(keySet2) && keySet2.containsAll(keySet1)){
-                ok = true;
-            }
+        boolean ok = true;
+        Set keySet1 = map1.keySet();
+        Set keySet2 = map2.keySet();
+        Set diff = calculateSymmetricDifference(keySet1,keySet2);
+        if(diff.size()>0){
+            ok = false;
+            check(ok,false,"Properties mismatched: " + diff.toString());
         }
-        check(ok,false,"Properties mismatched");
+
         return ok;
     }
 
@@ -149,7 +160,9 @@ public class MjsonComparator {
             }
         }else{
             String formattedMsg = String.format(msg,args);
-            logList.add(formattedMsg);
+            if(formattedMsg.trim().length() > 0){
+                logList.add(formattedMsg);
+            }
         }
     }
 
@@ -159,8 +172,10 @@ public class MjsonComparator {
      */
     public String getMsg(){
         StringBuilder builder = new StringBuilder();
+        String prefix = "";
         for(String inStr : logList) {
-            builder.append(inStr+" ");
+            builder.append(prefix + inStr);
+            prefix = " -> ";
         }
         return builder.toString();
     }

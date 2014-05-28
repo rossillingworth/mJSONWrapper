@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 public class MjsonComparatorTest {
 
     @Test
-    public void compareTest1() throws IOException {
+    public void compareIdenticalObjects() throws IOException {
         // load JSON string
         String jsonString = readFileAsString("/mjsonwrapper/test1.json");
         // populate 2 identical objects
@@ -28,27 +28,57 @@ public class MjsonComparatorTest {
     }
 
     @Test
-    public void compareTest2() throws IOException {
+    public void aSmallChangeToOneSubObjectWithReverseCompare() throws IOException {
+
         // load JSON string
         String jsonString1 = readFileAsString("/mjsonwrapper/test1.json");
+
         // populate 2 identical objects
         MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString1);
         MJsonWrapper mJsonWrapper2 = new MJsonWrapper(jsonString1);
+
         // modify one of the objects
-        mJsonWrapper2.set("x",1);
-        // test both variantsMjsonComparator mjsonComparator = new MjsonComparator();
+        mJsonWrapper2.set("e.x",1);
+
         MjsonComparator mjsonComparator = new MjsonComparator();
-        assertEquals(false, mjsonComparator.compare(mJsonWrapper1.get(), mJsonWrapper2.get()));
+
+        // test 1 way round
+        boolean diff1 = mjsonComparator.compare(mJsonWrapper1.get(), mJsonWrapper2.get());
+        assertEquals(false, diff1);
         String error1 = mjsonComparator.getMsg();
+
+        // now clear msgs
         mjsonComparator.clearMsg();
-        assertEquals(false, mjsonComparator.compare(mJsonWrapper2.get(), mJsonWrapper1.get()));
+
+        // test the other way round
+        boolean diff2 = mjsonComparator.compare(mJsonWrapper2.get(), mJsonWrapper1.get());
+        assertEquals(false, diff2);
         String error2 = mjsonComparator.getMsg();
 
-        System.out.println(error1);
-        System.out.println(error2);
+        // ensure msgs work properly
+        String errorMsg = "e -> Properties mismatched: [x]";
+        assertEquals(errorMsg,error1);
+        assertEquals(errorMsg,error2);
     }
 
 
+    @Test
+    public void arraySizeModification() throws IOException {
+        // load JSON string
+        String jsonString = readFileAsString("/mjsonwrapper/test1.json");
+        // populate 2 identical objects
+        MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString);
+        MJsonWrapper mJsonWrapper2 = new MJsonWrapper(jsonString);
+
+        mJsonWrapper1.get("e.h").asJsonList().add(Json.object());
+
+        MjsonComparator mjsonComparator = new MjsonComparator();
+        boolean diff = mjsonComparator.compare(mJsonWrapper1, mJsonWrapper2);
+        assertEquals(false, diff);
+
+        String errorMsg = mjsonComparator.getMsg();
+        assertEquals("h -> e -> Array index mismatch",errorMsg);
+    }
 
     /**
      * Load file from resouces
