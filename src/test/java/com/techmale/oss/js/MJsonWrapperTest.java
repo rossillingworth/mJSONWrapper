@@ -61,7 +61,6 @@ public class MJsonWrapperTest {
     }
 
     @Test
-    @Ignore
     public void createPropertiesTest() throws IOException {
 
         String jsonString = readFileAsString("/mjsonwrapper/test1.json");
@@ -72,10 +71,10 @@ public class MJsonWrapperTest {
         mJsonWrapper.set("x.y.z.char", "c");
         mJsonWrapper.set("x.y.z.map", new HashMap() {{put("key1", "val1");}});
 
-        String expect = "{\"e\":{},\"b\":2,\"c\":{\"d\":3},\"a\":1,\"x\":{\"y\":{\"z\":{\"char\":\"c\",\"integer\":1,\"string\":\"hello world\",\"map\":{\"key1\":\"val1\"},\"boolean\":true}}}}";
+        String expectedString = readFileAsString("/mjsonwrapper/expected_properties.json");
+        Json expectedJson = Json.read(expectedString);
 
-        Json expectJson = Json.read(expect);
-        assertTrue(expectJson.equals(mJsonWrapper.get()));
+        assertTrue(mJsonWrapper.equals(expectedJson));
 
         assertEquals(true, mJsonWrapper.get("x.y.z.boolean").asBoolean());
         assertEquals(1, mJsonWrapper.get("x.y.z.integer").asInteger());
@@ -119,6 +118,35 @@ public class MJsonWrapperTest {
 
     }
 
+    @Test
+    public void testEqualsWorks() throws IOException {
+
+        String jsonString = readFileAsString("/mjsonwrapper/test1.json");
+        MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString);
+        MJsonWrapper mJsonWrapper2 = new MJsonWrapper(jsonString);
+
+        assertTrue(mJsonWrapper1.equals(mJsonWrapper2));
+
+    }
+
+    @Test
+    public void testEqualsAgainstString() throws IOException {
+
+        String jsonString = readFileAsString("/mjsonwrapper/test1.json");
+        MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString);
+        assertTrue(mJsonWrapper1.equals(jsonString));
+
+    }
+
+    @Test
+    public void testToString(){
+
+        String json = "{\"a\":{\"b\":1}}";
+        MJsonWrapper mJsonWrapper = new MJsonWrapper(json);
+        String output = mJsonWrapper.toString();
+
+        assertEquals(json,output);
+    }
 
     /**
      * Load file from resouces

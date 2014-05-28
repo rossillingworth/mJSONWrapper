@@ -28,10 +28,40 @@ public class MjsonComparatorTest {
     }
 
     @Test
+    public void changePropertyType() throws IOException {
+        // load JSON string
+        String jsonString = readFileAsString("/mjsonwrapper/test1.json");
+
+        // populate 2 identical objects
+        MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString);
+        MJsonWrapper mJsonWrapper2 = new MJsonWrapper(jsonString);
+
+        mJsonWrapper1.set("a", "999");
+        MjsonComparator mjsonComparator = new MjsonComparator();
+        // test 1 way
+        boolean diff1 = mjsonComparator.compare(mJsonWrapper1, mJsonWrapper2);
+        assertEquals(false, diff1);
+        String error1 = mjsonComparator.getMsg();
+
+        // clear errors
+        mjsonComparator.clearMsg();
+
+        // test reverse way
+        boolean diff2 = mjsonComparator.compare(mJsonWrapper2, mJsonWrapper1);
+        assertEquals(false, diff1);
+        String error2 = mjsonComparator.getMsg();
+
+        String expected = "a -> ERROR: type mismatch";
+        assertEquals(expected,error1);
+        assertEquals(expected,error2);
+    }
+
+    @Test
     public void aSmallChangeToOneSubObjectWithReverseCompare() throws IOException {
 
         // load JSON string
         String jsonString1 = readFileAsString("/mjsonwrapper/test1.json");
+        String expectedErrorMsg = "e -> Properties mismatched: [x]";
 
         // populate 2 identical objects
         MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString1);
@@ -44,21 +74,21 @@ public class MjsonComparatorTest {
 
         // test 1 way round
         boolean diff1 = mjsonComparator.compare(mJsonWrapper1.get(), mJsonWrapper2.get());
-        assertEquals(false, diff1);
         String error1 = mjsonComparator.getMsg();
+
+        assertEquals(false, diff1);
+        assertEquals(expectedErrorMsg,error1);
 
         // now clear msgs
         mjsonComparator.clearMsg();
 
         // test the other way round
         boolean diff2 = mjsonComparator.compare(mJsonWrapper2.get(), mJsonWrapper1.get());
-        assertEquals(false, diff2);
         String error2 = mjsonComparator.getMsg();
 
-        // ensure msgs work properly
-        String errorMsg = "e -> Properties mismatched: [x]";
-        assertEquals(errorMsg,error1);
-        assertEquals(errorMsg,error2);
+        assertEquals(false, diff2);
+        assertEquals(expectedErrorMsg,error2);
+
     }
 
 
@@ -77,7 +107,9 @@ public class MjsonComparatorTest {
         assertEquals(false, diff);
 
         String errorMsg = mjsonComparator.getMsg();
-        assertEquals("h -> e -> Array index mismatch",errorMsg);
+
+        String expected = "h -> e -> Array index mismatch";
+        assertEquals(expected,errorMsg);
     }
 
     /**

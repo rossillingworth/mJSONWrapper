@@ -1,0 +1,36 @@
+{
+    "d": 4,
+    "e": {
+        "f": 6,
+        "g": true,
+        "h": []
+    },
+    "b": 2,
+    "c": 3,
+    "a": 1,
+    "types": {
+        "string": "a string",
+        "boolean": true,
+        "number": 123,
+        "object": {
+            "a": "b"
+        },
+        "null": null,
+        "array": [1, 2, 3, "substring", {
+            "z": ["1", "2", null]
+        }]
+    },
+    "x": {
+        "y": {
+            "z": {
+                "char": "c",
+                "integer": 1,
+                "string": "hello world",
+                "map": {
+                    "key1": "val1"
+                },
+                "boolean": true
+            }
+        }
+    }
+}

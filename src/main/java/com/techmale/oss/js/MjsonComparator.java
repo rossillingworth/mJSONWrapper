@@ -98,7 +98,7 @@ public class MjsonComparator {
                         }
                         break;
                     default:
-                        throw new IllegalArgumentException("Unknown JSON Type");
+                        throw new IllegalArgumentException("Unknown JSON Type in MjsonComparator");
                 }
             }
 
