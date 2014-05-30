@@ -13,7 +13,9 @@
 
     <packaging>jar</packaging>
 
-    <name>mJSONWrapper</name>
+    <name>Minimal JSON Library Wrapper</name>
+    <description>Wraps mjson, providing full path accessors to JSON data, meaningful exception when expectation fail and JSON comparator for unit testing.</description>
+
     <url>https://github.com/rossillingworth/mJSONWrapper</url>
 
     <licenses>
@@ -45,9 +47,18 @@
 
     <developers>
         <developer>
-            <id>...</id>
-            <name>...</name>
-            <email>...</email>
+            <id>rossillingworth</id>
+            <name>Ross Illingworth</name>
+            <email>ross.illingworth@techmale.com</email>
+            <url>http://www.techmale.com</url>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>0</timezone>
+            <!--<properties>-->
+                <!--<picUrl>http://tinyurl.com/prv4t</picUrl>-->
+            <!--</properties>-->
         </developer>
     </developers>
 
