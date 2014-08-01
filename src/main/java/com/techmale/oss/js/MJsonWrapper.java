@@ -2,7 +2,7 @@ package com.techmale.oss.js;
 
 import mjson.Json;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * Note:
@@ -128,6 +128,25 @@ public class MJsonWrapper {
     public boolean equals(Json json){
         MjsonComparator mjsonComparator = new MjsonComparator();
         return mjsonComparator.compare(this.get(),json);
+    }
+
+    /**
+     * Merge current JSON with injected JSON
+     * and return a new mJSONwrapper object
+     *
+     * @param json
+     * @return a new MjsonWrapper object of overridden JSON data
+     */
+    public MJsonWrapper merge(MJsonWrapper json){
+
+        Map jsonMap = this.get().asMap();
+        Map jsonOverwriteMap = json.get().asMap();
+
+        // inject into jsonMap
+        jsonMap.putAll(jsonOverwriteMap);
+
+        Json.DefaultFactory factory = new Json.DefaultFactory();
+        return new MJsonWrapper(factory.make(jsonMap));
     }
 
     /**

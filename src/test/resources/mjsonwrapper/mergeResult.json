@@ -1,0 +1,27 @@
+{
+    "d": 4,
+    "e": {
+        "f": 6,
+        "g": true,
+        "h": {
+            "z": [],
+            "y": "string",
+            "x": 1
+        }
+    },
+    "b": "foobar",
+    "c": [1, 2, 3, 4],
+    "a": 99999,
+    "types": {
+        "string": "a string",
+        "boolean": true,
+        "number": 123,
+        "object": {
+            "a": "b"
+        },
+        "null": null,
+        "array": [1, 2, 3, "substring", {
+            "z": ["1", "2", null]
+        }]
+    }
+}

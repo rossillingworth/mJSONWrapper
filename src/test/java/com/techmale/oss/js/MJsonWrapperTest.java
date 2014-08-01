@@ -1,14 +1,10 @@
 package com.techmale.oss.js;
 
 import mjson.Json;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
@@ -135,6 +131,24 @@ public class MJsonWrapperTest {
         String jsonString = readFileAsString("/mjsonwrapper/test1.json");
         MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString);
         assertTrue(mJsonWrapper1.equals(jsonString));
+
+    }
+
+    @Test
+    public void testMerge() throws IOException {
+
+        String jsonString1 = readFileAsString("/mjsonwrapper/test1.json");
+        String jsonString2 = readFileAsString("/mjsonwrapper/test2.json");
+        String jsonString3 = readFileAsString("/mjsonwrapper/mergeResult.json");
+
+        MJsonWrapper mJsonWrapper1 = new MJsonWrapper(jsonString1);
+        MJsonWrapper mJsonWrapper2 = new MJsonWrapper(jsonString2);
+
+        MJsonWrapper mJsonWrapper3 =mJsonWrapper1.merge(mJsonWrapper2);
+
+        //System.out.println(mJsonWrapper1.toString());
+
+        assertTrue(mJsonWrapper3.equals(jsonString3));
 
     }
 
