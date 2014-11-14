@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class MJsonWrapper {
 
-    public enum TYPE {STRING,NUMBER,OBJECT,ARRAY,BOOLEAN,NULL};
+    public enum TYPE {STRING, NUMBER, OBJECT, ARRAY, BOOLEAN, NULL}
 
     private Json json;
 
@@ -93,7 +93,7 @@ public class MJsonWrapper {
         j.set(lastName, value);
     }
 
-    public MjsonType typeOf(String path){
+    public MjsonType typeOf(String path) {
         Json json = this.get(path);
         return MjsonType.typeOf(json);
     }
@@ -105,29 +105,30 @@ public class MJsonWrapper {
      * @param json
      * @return
      */
-    public boolean equals(String json){
+    public boolean equals(String json) {
         return equals(Json.read(json));
     }
 
 
-
     /**
      * Compare current data against another MJsonWrapper object
+     *
      * @param json
      * @return
      */
-    public boolean equals(MJsonWrapper json){
+    public boolean equals(MJsonWrapper json) {
         return equals(json.get());
     }
 
     /**
      * Compare current data against another Json object
+     *
      * @param json
      * @return
      */
-    public boolean equals(Json json){
+    public boolean equals(Json json) {
         MjsonComparator mjsonComparator = new MjsonComparator();
-        return mjsonComparator.compare(this.get(),json);
+        return mjsonComparator.compare(this.get(), json);
     }
 
     /**
@@ -137,16 +138,24 @@ public class MJsonWrapper {
      * @param json
      * @return a new MjsonWrapper object of overridden JSON data
      */
-    public MJsonWrapper merge(MJsonWrapper json){
-
-        Map jsonMap = this.get().asMap();
-        Map jsonOverwriteMap = json.get().asMap();
+    public MJsonWrapper merge(MJsonWrapper json) {
+        Map<String, Object> jsonMap = this.get().asMap();
+        Map<String, Object> jsonOverwriteMap = json.get().asMap();
 
         // inject into jsonMap
         jsonMap.putAll(jsonOverwriteMap);
 
         Json.DefaultFactory factory = new Json.DefaultFactory();
         return new MJsonWrapper(factory.make(jsonMap));
+    }
+
+    public boolean has(String path) {
+        try {
+            Json result = get(path);
+            return result != null;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     /**
