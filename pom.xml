@@ -9,7 +9,7 @@
 
     <groupId>com.techmale</groupId>
     <artifactId>mJSONWrapper</artifactId>
-    <version>1.1</version>
+    <version>1.1</version><!-- -SNAPSHOT -->
 
     <packaging>jar</packaging>
 
@@ -131,7 +131,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <!--<version>2.9.1</version>-->
+                <version>2.9.1</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -144,6 +144,7 @@
             <!-- SRC Plugin -->
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>2.3</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -157,7 +158,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <!--<version>1.5</version>-->
+                <version>1.5</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -168,9 +169,25 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- NEXUS STAGING Plugin: OSS deployment tool (see notes.txt) -->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.5</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh_snapshot</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>false</autoReleaseAfterClose><!-- set to TRUE to auto-release after deploy -->
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-    <!-- SRC CONTROL -->
+    <!--
+    ##############################
+        SRC CONTROL
+    ##############################
+    -->
     <scm>
         <connection>scm:git:git://github.com/rossillingworth/mJSONWrapper.git</connection>
         <developerConnection>scm:git:git@github.com:rossillingworth/mJSONWrapper.git</developerConnection>
@@ -178,15 +195,18 @@
     </scm>
     <!-- Sonatype Repo for Maven Central -->
     <distributionManagement>
+        <!-- Used for SNAPSHOT & Nexus-Staging control (eg: mvn clean deploy & mvn nexus-staging:release) -->
         <snapshotRepository>
             <id>ossrh_snapshot</id>
             <name>Sonatype Nexus SNAPSHOT Repository</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <!-- only used by Maven-Deploy-Plugin (eg: mvn deploy)-->
         <repository>
             <id>ossrh_release</id>
             <name>Sonatype Nexus RELEASE Repository</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+
 </project>

@@ -1,0 +1,46 @@
+
+
+to compile / package / test & sign artifacts.
+--------------------------------------------------
+run "verify":
+
+
+sonatype's help
+------------------
+Getting started: http://central.sonatype.org/pages/ossrh-guide.html#deployment
+Using Maven    : http://central.sonatype.org/pages/apache-maven.html
+Manual Release : http://central.sonatype.org/pages/releasing-the-deployment.html
+
+
+Sonatype HOST:
+-----------------
+https://oss.sonatype.org/#welcome
+
+
+To push to repo
+--------------------
+Once all changes are made, run "mvn clean deploy"
+then read: http://central.sonatype.org/pages/releasing-the-deployment.html
+
+Open Sonatype site
+Select Staging Repositories
+Find & select comtechmale-XXXX
+check it is ok
+click CLOSE at top of tabs
+click REFRESH when done
+select comtechname-XXXX
+click RELEASE
+
+
+Using the NEXUS plugin
+--------------------------
+mvn clean deploy
+mvn nexus-staging:release
+mvn nexus-staging:drop
+
+
+
+TODO:
+change to use the nexus-staging-maven-plugin & rewrite notes to use that
+
+
