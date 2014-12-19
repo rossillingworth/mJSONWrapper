@@ -162,6 +162,35 @@ public class MJsonWrapperTest {
         assertEquals(json,output);
     }
 
+    @Test
+    public void testHasWithSingleLevel() {
+        String json = "{\"a\":\"b\"}";
+        MJsonWrapper mJsonWrapper = new MJsonWrapper(json);
+
+        boolean result = mJsonWrapper.has("a");
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void testHasWithMultiLevel() {
+        String json = "{\"a\":{\"b\":\"c\"}}";
+        MJsonWrapper mJsonWrapper = new MJsonWrapper(json);
+
+        boolean result = mJsonWrapper.has("a.b");
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void testHasWithPathThatDoesNotExist() {
+        String json = "{\"a\":\"b\"}";
+        MJsonWrapper mJsonWrapper = new MJsonWrapper(json);
+        boolean result = mJsonWrapper.has("b");
+
+        assertFalse(result);
+    }
+
     /**
      * Load file from resouces
      *
