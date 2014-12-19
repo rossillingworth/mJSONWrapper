@@ -31,6 +31,10 @@ mvn clean deploy
 mvn nexus-staging:release
 mvn nexus-staging:drop
 
+#########
+CAVEATs
+#########
+If auth error, check repo names & UID/PW in Settings.xml
 
 ###########
 OLD
